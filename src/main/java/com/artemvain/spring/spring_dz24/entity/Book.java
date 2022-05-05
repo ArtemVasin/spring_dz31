@@ -2,6 +2,9 @@ package com.artemvain.spring.spring_dz24.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.ResponseEntity;
+import reactor.core.CoreSubscriber;
+import reactor.core.publisher.Mono;
 
 import javax.persistence.*;
 
@@ -9,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "book")
 @Getter
 @Setter
-public class Book {
+public class Book extends Mono<ResponseEntity<Book>> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,6 +53,11 @@ public class Book {
     }
 
     public Book() {
+    }
+
+    @Override
+    public void subscribe(CoreSubscriber<? super ResponseEntity<Book>> coreSubscriber) {
+
     }
 
     public Book(String name, Author author, int creationYear, int pageCount, int price) {

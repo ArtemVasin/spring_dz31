@@ -4,9 +4,12 @@ package com.artemvain.spring.spring_dz24.controllers;
 import com.artemvain.spring.spring_dz24.entity.*;
 import com.artemvain.spring.spring_dz24.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,19 +44,20 @@ public class UserController {
 
     @GetMapping({"/welcome"})
     public String welcome() {
-        String w = "HELLO!!! WELCOME!!!";
+        String w = "welcome!";
         return w;
     }
 
 
     @GetMapping({"/books"})
-    public List<Book> showAllBooks() {
+    public Flux<Book> showAllBooks() {
         List<Book> allBooks = this.bookService.getAllBooks();
-        return allBooks;
+        Flux<Book> fluxFromList = Flux.fromIterable(allBooks);
+        return fluxFromList;
     }
 
     @GetMapping({"/books/{id}"})
-    public Book getBook(@PathVariable int id) {
+    public Mono<ResponseEntity<Book>> getBook(@PathVariable int id) {
         Book book = this.bookService.getBook(id);
         return book;
     }
