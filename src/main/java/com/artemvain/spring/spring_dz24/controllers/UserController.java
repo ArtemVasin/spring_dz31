@@ -158,8 +158,6 @@ public class UserController {
 
 
     private AuthenticationManager authenticationManager;
-
-
     private JWTUtil jwtTokenUtil;
 
 
@@ -173,7 +171,6 @@ public class UserController {
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Имя или пароль неправильны", e);
         }
-        // при создании токена в него кладется username как Subject и список authorities как кастомный claim
         String jwt = jwtTokenUtil.generateToken((UserDetails) authentication.getPrincipal());
 
         return new AuthResponse(jwt);

@@ -19,7 +19,7 @@ public class JWTUtil {
     @Value("${jwt.sessionTime}")
     private long sessionTime;
 
-    // генерация токена (кладем в него имя пользователя и authorities)
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         String commaSeparatedListOfAuthorities = userDetails.getAuthorities().stream().map(a -> a.getAuthority()).collect(Collectors.joining(","));
@@ -27,12 +27,11 @@ public class JWTUtil {
         return createToken(claims, userDetails.getUsername());
     }
 
-    //извлечение имени пользователя из токена (внутри валидация токена)
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    //извлечение authorities (внутри валидация токена)
+
     public String extractAuthorities(String token) {
         Function<Claims, String> claimsListFunction = claims -> {
             return (String) claims.get("authorities");
