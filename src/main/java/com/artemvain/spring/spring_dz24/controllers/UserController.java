@@ -2,21 +2,48 @@ package com.artemvain.spring.spring_dz24.controllers;
 
 
 import com.artemvain.spring.spring_dz24.entity.*;
+import com.artemvain.spring.spring_dz24.security.AuthRequest;
+import com.artemvain.spring.spring_dz24.security.AuthResponse;
+import com.artemvain.spring.spring_dz24.security.JWTUtil;
 import com.artemvain.spring.spring_dz24.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.security.authentication.AuthenticationManager;
+//import org.springframework.security.authentication.BadCredentialsException;
+//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.ResponseStatus;
+//import org.springframework.web.bind.annotation.RestController;
+//import org.springframework.web.server.ResponseStatusException;
+//import ru.sysout.jwt.security.AuthRequest;
+//import ru.sysout.jwt.security.AuthResponse;
+//import ru.sysout.jwt.security.JWTUtil;
 
 @RestController
 @Slf4j
@@ -127,6 +154,29 @@ public class UserController {
     public List<OrderBook> showAllOrder() {
         List<OrderBook> allOrder = orderService.getAllOrderBook();
         return allOrder;
+    }
+
+
+    private AuthenticationManager authenticationManager;
+
+
+    private JWTUtil jwtTokenUtil;
+
+
+    @PostMapping("/authenticate")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponse createAuthenticationToken(@RequestBody AuthRequest authRequest) {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getName(), authRequest.getPassword()));
+            System.out.println(authentication);
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Имя или пароль неправильны", e);
+        }
+        // при создании токена в него кладется username как Subject и список authorities как кастомный claim
+        String jwt = jwtTokenUtil.generateToken((UserDetails) authentication.getPrincipal());
+
+        return new AuthResponse(jwt);
     }
 
 }
