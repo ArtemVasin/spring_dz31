@@ -3,8 +3,11 @@ package com.artemvain.spring.spring_dz24.controllers;
 
 import com.artemvain.spring.spring_dz24.entity.*;
 import com.artemvain.spring.spring_dz24.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @RestController
-
+@Slf4j
 @RequestMapping("/api")
 public class UserController {
 
@@ -47,6 +50,8 @@ public class UserController {
         String w = "welcome!";
         return w;
     }
+
+
 
 
     @GetMapping({"/books"})
@@ -102,6 +107,20 @@ public class UserController {
     public User updateUser(@RequestBody User user) {
         this.userService.saveUser(user);
         return user;
+    }
+
+    @Autowired
+    private JmsTemplate jmsTemplate;
+
+    @GetMapping(value = "/send/{message}", produces = "text/html")
+    public String sendMessage(@PathVariable String message) {
+        jmsTemplate.convertAndSend("superqueue", message);
+        return "done";
+    }
+
+    @JmsListener(destination="superqueue")
+    public  void processMessage(String message) {
+        log.info("Order:  " + message);
     }
 
     @GetMapping({"/orders"})

@@ -5,8 +5,10 @@ import com.artemvain.spring.spring_dz24.entity.BookWarehouse;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.jms.annotation.EnableJms;
 
 @SpringBootApplication
+@EnableJms
 public class Spring24Application {
 
     public static void main(String[] args) {
